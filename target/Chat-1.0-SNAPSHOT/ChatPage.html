@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html  style="background-color: rosybrown">
+<head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+
+
+<script src=http://code.jquery.com/jquery-latest.min.js></script>
+<script>
+
+
+    var wsocket;
+    var online;
+    wsocket=new WebSocket("ws://localhost:9090/DayThree_war_exploded/echo");
+    wsocket.onopen=onOpen;
+    wsocket.onmessage=onMessage;
+
+
+    function onOpen(user) {
+        console.log("Connection Established");
+
+
+
+
+    }
+
+    wsocket.onClose=function () {
+        console.log("Connection To WebSocket Endpoint Terminated...");
+
+    } ;
+
+
+
+
+    function onMessage(event) {
+
+        var users = new Set();
+        var obj = JSON.parse(event.data);
+        $('table').empty();
+        obj.forEach((user) => {
+
+            users.add(user.sender);
+
+            var content = '<tr><td>' +"from : "+ user.sender + '.' + '<br>' + user.text + '</td></tr>';
+            $('table').append(content);
+        });
+
+        var onlineUsers = '[ ';
+        users.forEach(u => {
+            onlineUsers += u + ', ';
+        })
+        onlineUsers += ' ]';
+        $('#onlineusers').html(onlineUsers);
+
+
+
+
+    }
+
+
+
+    function login() {
+        $("#loginform").hide();
+        $("#messageform").show();
+        showOnline();
+    }
+    function  showOnline() {
+        var sender = $("#userid").val();
+        console.log(sender);
+        if(sender!==null)
+        $('#onlineusers').html(sender);
+        else
+            $('#onlineusers').html('');
+    }
+
+
+    function send() {
+        var sender = $("#userid").val();
+        var text = $("#text").val();
+        /*
+        ***********
+        */
+        var data = { sender: sender, text: text };
+        console.log(data);
+        wsocket.send(JSON.stringify(data));
+        /*
+        ***********
+        */
+
+
+
+    }
+
+
+
+</script>
+
+
+<body  onload= "setInterval(showOnline(),5)">
+<div style="margin-top:5%;margin-left: 20%;  width: 600px;  ">
+    <div id="onlineusers" style="color: wheat">
+        <table style=" width: 100%;" id="table2">
+            <h1>Online User : </h1>
+        </table>
+
+
+    </div>
+    <div>
+
+        <!-- <label style="background-color: black; color: white" id="name-label">your name</label>
+         <input type="text" name="name" id="name" required>
+         <br>
+         <input type="button" value="login" id="loginBtn" onclick="login()">
+     </form>-->
+
+        <form name="loginform" id="loginform" >
+            <center style="color: wheat"><h1> Login  </h1></center>
+            <table width="20%"  align="center">
+
+
+                <tr>
+                    <td style="color: wheat">Username:</td>
+                    <td><input   type="text" size=25 id="userid" name="userid"></td>
+                </tr>
+
+
+
+                <tr align="center">
+
+                    <td><input style="color: wheat" type="button" value="login" id="loginBtn" onclick="login()"></td>
+                </tr>
+
+            </table>
+        </form>
+
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <div  id="messageform" hidden bgcolor="#fff" style="color: black" width="50%" >
+
+        <center><h1 style="color: wheat"> Chat Page </h1></center>
+
+        <form  name ="ajax" action = "onmessage" >
+           <!-- <label for="sender" style="color: wheat">Name:</label>
+            <input type="text" id="sender" name="name"><br><br>
+             <input type = "button" value = "Send" id="SubmitButton2" onclick="sendUser()">-->
+            <label for="text" style="color: wheat">Message:</label>
+            <input type="text" id="text" name="msg"><br><br>
+            <input type = "button" value = "Send" id="SubmitButton" onclick="send()">
+        </form>
+
+        <!--Submit-->
+        <table style=" width: 100%;" id="table" bgcolor="#f5deb3">
+        </table>
+
+    </div>
+
+
+
+
+</div>
+
+
+
+
+
+</body>
+</html>
